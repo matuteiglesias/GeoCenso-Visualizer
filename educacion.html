@@ -1,0 +1,89 @@
+
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset='utf-8' />
+      <title>Display a map</title>
+      <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+      <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
+      <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
+      <style>
+         body { margin:0; padding:0; }
+         h2,
+         h3 {margin: 10px;font-size: 1.2em;}
+         h3 {font-size: 1em;}
+         p {font-size: 0.85em; margin: 10px; text-align: left; }
+         #map { position:absolute; top:0; bottom:0; width:100%; }
+         .map-overlay {
+         position: absolute;
+         bottom: 0;
+         right: 0;
+         background: rgba(255, 255, 255, 0.8);
+         margin-right: 20px;
+         font-family: Arial, sans-serif;
+         overflow: auto;
+         border-radius: 3px;
+         }
+         #features {
+         position: absolute;
+         top: 0;
+         height: 650px;
+         margin-top: 20px;
+         width: 400px;
+         }
+      </style>
+   </head>
+   <body>
+      <div id='map'></div>
+      <div class='map-overlay' id='features'>
+         <h2>Variables educativas <br> (Censo 2010)</h2>
+         <div id='pd'>
+            <p>Hover over map. Use zoom.</p>
+         </div>
+      </div>
+      <div class='map-overlay' id='legend'></div>
+      <script>
+         mapboxgl.accessToken = 'pk.eyJ1IjoibWF0dXRlaWdsZXNpYXMiLCJhIjoiY2ptdGN1bjViMDY4MzNxcDEyMXQ4ejU4bCJ9.wOgfXtbyetTot1CZN8D6Hg';
+         var map = new mapboxgl.Map({
+           container: 'map',
+           style: 'mapbox://styles/matuteiglesias/cjq02agrj108r2tmiahqgidzz',
+           center: [-60, -32],
+           zoom: 6
+         }); 
+         
+         map.getCanvas().style.cursor = 'default';
+         
+         //         map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);
+         
+         map.on('mousemove', function(e) {
+         var radios = map.queryRenderedFeatures(e.point, {
+         layers: ['radios-info']
+         });
+         var deptos = map.queryRenderedFeatures(e.point, {
+         layers: ['deptos-info']
+         });
+         var provs = map.queryRenderedFeatures(e.point, {
+         layers: ['provs-info']
+         });
+         
+         
+         
+         if (radios.length > 0) {      
+         document.getElementById('pd').innerHTML = 
+          '<table border="0" class="dataframe">  <thead>    <tr style="text-align: center;">      <th></th>      <th>n</th>      <th>%</th>    </tr>  </thead>  <tbody>    <tr>      <th>Mayores de 3 años:</th>       <td>' + radios[0].properties['P07_TOTAL'] + '      <td> 100 </td>   </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>    <tr>      <th>Sabe Leer:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + radios[0].properties['P07_1 Si'] + '       <td>' + radios[0].properties['%_P07_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + radios[0].properties['P07_2 No'] + '       <td>' + radios[0].properties['%_P07_2 No'] + '    </tr>    <tr>      <th>Usa PC: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + radios[0].properties['P12_1 Si'] + '       <td>' + radios[0].properties['%_P12_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + radios[0].properties['P12_2 No'] + '       <td>' + radios[0].properties['%_P12_2 No'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Asistencia a escuela: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Asiste</th>       <td>' + radios[0].properties['P08_1 Asiste'] + '       <td>' + radios[0].properties['%_P08_1 Asiste']+ '    </tr>    <tr>      <th>Asistio</th>       <td>' + radios[0].properties['P08_2 Asistio'] + '       <td>' + radios[0].properties['%_P08_2 Asistio'] + '    </tr>    <tr>      <th>No Asistio</th>       <td>' + radios[0].properties['P08_3 Nunca asistio'] + '       <td>' + radios[0].properties['%_P08_3 Nunca asistio'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>   <tr>      <th>¿Que nivel educativo? </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Inicial</th>       <td>' + radios[0].properties['P09_1 Inicial (jardin, preescolar)'] + '       <td>' + radios[0].properties['%_P09_1 Inicial (jardin, preescolar)'] + '    </tr>    <tr>      <th>Primario</th>       <td>' + radios[0].properties['P09_2 Primario'] + '       <td>' + radios[0].properties['%_P09_2 Primario'] + '    </tr>    <tr>      <th>Secundario</th>       <td>' +radios[0].properties['P09_4 Secundario'] + '       <td>' + radios[0].properties['%_P09_4 Secundario'] + '    </tr>    <tr>      <th>Terc. no univ</th>       <td>' + radios[0].properties['P09_6 Superior no universitario'] + '       <td>' + radios[0].properties['%_P09_6 Superior no universitario'] + '    </tr>    <tr>      <th>Universitario</th>       <td>' + radios[0].properties['P09_7 Universitario'] + '       <td>' + radios[0].properties['%_P09_7 Universitario'] + '    </tr>    <tr>      <th>Postgrado</th>       <td>' + radios[0].properties['P09_8 Post universitario'] + '       <td>' + radios[0].properties['%_P09_8 Post universitario'] + '    </tr>    <tr>      <th>Especial</th>       <td>' + radios[0].properties['P09_9 Educacion especial'] + '       <td>' + radios[0].properties['%_P09_9 Educacion especial'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Terminado:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + radios[0].properties['P10_1 Si'] + '       <td>' + radios[0].properties['%_P10_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + radios[0].properties['P10_2 No'] + '       <td>' + radios[0].properties['%_P10_2 No'] + '    </tr>  </tbody></table>';
+         } else if (deptos.length > 0) {
+         document.getElementById('pd').innerHTML = 
+          'Departamento: ' + deptos[0].properties['departamen'] + '<br><table border="0" class="dataframe">  <thead>    <tr style="text-align: center;">      <th></th>      <th>n</th>      <th>%</th>    </tr>  </thead>  <tbody>    <tr>      <th>Mayores de 3 años:</th>       <td>' + deptos[0].properties['P07_TOTAL'] + '      <td> 100 </td>   </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>    <tr>      <th>Sabe Leer:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + deptos[0].properties['P07_1 Si'] + '       <td>' + deptos[0].properties['%_P07_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + deptos[0].properties['P07_2 No'] + '       <td>' + deptos[0].properties['%_P07_2 No'] + '    </tr>    <tr>      <th>Usa PC: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + deptos[0].properties['P12_1 Si'] + '       <td>' + deptos[0].properties['%_P12_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + deptos[0].properties['P12_2 No'] + '       <td>' + deptos[0].properties['%_P12_2 No'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Asistencia a escuela: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Asiste</th>       <td>' + deptos[0].properties['P08_1 Asiste'] + '       <td>' + deptos[0].properties['%_P08_1 Asiste']+ '    </tr>    <tr>      <th>Asistio</th>       <td>' + deptos[0].properties['P08_2 Asistio'] + '       <td>' + deptos[0].properties['%_P08_2 Asistio'] + '    </tr>    <tr>      <th>No Asistio</th>       <td>' + deptos[0].properties['P08_3 Nunca asistio'] + '       <td>' + deptos[0].properties['%_P08_3 Nunca asistio'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>   <tr>      <th>¿Que nivel educativo? </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Inicial</th>       <td>' + deptos[0].properties['P09_1 Inicial (jardin, preescolar)'] + '       <td>' + deptos[0].properties['%_P09_1 Inicial (jardin, preescolar)'] + '    </tr>    <tr>      <th>Primario</th>       <td>' + deptos[0].properties['P09_2 Primario'] + '       <td>' + deptos[0].properties['%_P09_2 Primario'] + '    </tr>    <tr>      <th>Secundario</th>       <td>' +deptos[0].properties['P09_4 Secundario'] + '       <td>' + deptos[0].properties['%_P09_4 Secundario'] + '    </tr>    <tr>      <th>Terc. no univ</th>       <td>' + deptos[0].properties['P09_6 Superior no universitario'] + '       <td>' + deptos[0].properties['%_P09_6 Superior no universitario'] + '    </tr>    <tr>      <th>Universitario</th>       <td>' + deptos[0].properties['P09_7 Universitario'] + '       <td>' + deptos[0].properties['%_P09_7 Universitario'] + '    </tr>    <tr>      <th>Postgrado</th>       <td>' + deptos[0].properties['P09_8 Post universitario'] + '       <td>' + deptos[0].properties['%_P09_8 Post universitario'] + '    </tr>    <tr>      <th>Especial</th>       <td>' + deptos[0].properties['P09_9 Educacion especial'] + '       <td>' + deptos[0].properties['%_P09_9 Educacion especial'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Terminado:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + deptos[0].properties['P10_1 Si'] + '       <td>' + deptos[0].properties['%_P10_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + deptos[0].properties['P10_2 No'] + '       <td>' + deptos[0].properties['%_P10_2 No'] + '    </tr>  </tbody></table>';
+         } else if (provs.length > 0) {      
+         document.getElementById('pd').innerHTML = 
+          'Provincia: ' + provs[0].properties['NAM'] + '<br><table border="0" class="dataframe">  <thead>    <tr style="text-align: center;">      <th></th>      <th>n</th>      <th>%</th>    </tr>  </thead>  <tbody>    <tr>      <th>Mayores de 3 años:</th>       <td>' + provs[0].properties['P07_TOTAL'] + '      <td> 100 </td>   </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>    <tr>      <th>Sabe Leer:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + provs[0].properties['P07_1 Si'] + '       <td>' + provs[0].properties['%_P07_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + provs[0].properties['P07_2 No'] + '       <td>' + provs[0].properties['%_P07_2 No'] + '    </tr>    <tr>      <th>Usa PC: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + provs[0].properties['P12_1 Si'] + '       <td>' + provs[0].properties['%_P12_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + provs[0].properties['P12_2 No'] + '       <td>' + provs[0].properties['%_P12_2 No'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Asistencia a escuela: </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Asiste</th>       <td>' + provs[0].properties['P08_1 Asiste'] + '       <td>' + provs[0].properties['%_P08_1 Asiste']+ '    </tr>    <tr>      <th>Asistio</th>       <td>' + provs[0].properties['P08_2 Asistio'] + '       <td>' + provs[0].properties['%_P08_2 Asistio'] + '    </tr>    <tr>      <th>No Asistio</th>       <td>' + provs[0].properties['P08_3 Nunca asistio'] + '       <td>' + provs[0].properties['%_P08_3 Nunca asistio'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>   <tr>      <th>¿Que nivel educativo? </th>      <td></td>      <td></td>    </tr>    <tr>      <th>Inicial</th>       <td>' + provs[0].properties['P09_1 Inicial (jardin, preescolar)'] + '       <td>' + provs[0].properties['%_P09_1 Inicial (jardin, preescolar)'] + '    </tr>    <tr>      <th>Primario</th>       <td>' + provs[0].properties['P09_2 Primario'] + '       <td>' + provs[0].properties['%_P09_2 Primario'] + '    </tr>    <tr>      <th>Secundario</th>       <td>' +provs[0].properties['P09_4 Secundario'] + '       <td>' + provs[0].properties['%_P09_4 Secundario'] + '    </tr>    <tr>      <th>Terc. no univ</th>       <td>' + provs[0].properties['P09_6 Superior no universitario'] + '       <td>' + provs[0].properties['%_P09_6 Superior no universitario'] + '    </tr>    <tr>      <th>Universitario</th>       <td>' + provs[0].properties['P09_7 Universitario'] + '       <td>' + provs[0].properties['%_P09_7 Universitario'] + '    </tr>    <tr>      <th>Postgrado</th>       <td>' + provs[0].properties['P09_8 Post universitario'] + '       <td>' + provs[0].properties['%_P09_8 Post universitario'] + '    </tr>    <tr>      <th>Especial</th>       <td>' + provs[0].properties['P09_9 Educacion especial'] + '       <td>' + provs[0].properties['%_P09_9 Educacion especial'] + '    </tr>   <tr class="blank_row">    <td colspan="3"></td></tr>  <tr>      <th>Terminado:</th>      <td></td>      <td></td>    </tr>    <tr>      <th>Si</th>       <td>' + provs[0].properties['P10_1 Si'] + '       <td>' + provs[0].properties['%_P10_1 Si'] + '    </tr>    <tr>      <th>No</th>       <td>' + provs[0].properties['P10_2 No'] + '       <td>' + provs[0].properties['%_P10_2 No'] + '    </tr>  </tbody></table>';
+         } else {
+         document.getElementById('pd').innerHTML = '<p>Hover over map. Use zoom.</p>';
+         }
+         });
+      </script>
+   </body>
+</html>
+
+
